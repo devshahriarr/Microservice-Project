@@ -26,8 +26,7 @@
 
 # # Run Laravel development server
 # CMD php artisan serve --host=0.0.0.0 --port=9000
-# EXPOSE 9000
-
+# EXPOSE 8001
 
 # Base image
 FROM php:8.2-cli
@@ -38,6 +37,9 @@ RUN apt-get update && apt-get install -y \
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install PHP extensions required for Laravel + MySQL
+RUN docker-php-ext-install pdo pdo_mysql
 
 # Set working directory
 WORKDIR /app
@@ -55,8 +57,7 @@ COPY . .
 RUN composer run-script post-autoload-dump || true
 
 # Expose port (if needed)
-EXPOSE 9000
+EXPOSE 8001
 
 # Start command
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=9000"]
-
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8001"]

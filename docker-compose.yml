@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  # ================================
+  #  API Gateway
+  # ================================
+  gateway:
+    build: ./api-gateway
+    ports:
+      - "9000:9000"               # তোমার .env এ APP_URL=http://localhost:9000, তাই এই port expose হবে
+    depends_on:
+      - auth-service
+      - crud-service
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8001
+      - CRUD_SERVICE_URL=http://crud-service:8002
+    networks:
+      - app-network
+
+  # ================================
+  #  Authentication Service
+  # ================================
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=local
+      - APP_KEY=base64:he87ErdEb7cN2MjBtt5xd3Sxb+5AbCSl2Jn/i9jUdYg=
+      - DB_CONNECTION=mysql
+      - DB_HOST=db               # 👈 localhost না, বরং db
+      - DB_PORT=3306
+      - DB_DATABASE=auth_db      # 👈 তোমার আগে ছিল auth-db, mysql underscore পছন্দ করে
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # ================================
+  #  CRUD Service
+  # ================================
+  crud-service:
+    build: ./crud-service
+    ports:
+      - "8001:8001"
+    environment:
+      - APP_ENV=local
+      - APP_KEY=base64:he87ErdEb7cN2MjBtt5xd3Sxb+5AbCSl2Jn/i9jUdYg=
+      - DB_CONNECTION=mysql
+      - DB_HOST=db               # 👈 একইভাবে এখানে db
+      - DB_PORT=3306
+      - DB_DATABASE=crud_db      # 👈 তোমার আগে ছিল property, কিন্তু আলাদা নাম রাখাই ভালো
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # ================================
+  #  MySQL Database
+  # ================================
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: main_db     # 👈 এটা কেবল default তৈরি হবে, services আলাদা database তৈরি করতে পারবে
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db_data:
