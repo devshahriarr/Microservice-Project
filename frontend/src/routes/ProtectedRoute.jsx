@@ -1,19 +1,6 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
-import axiosClient from "../api/axiosClient";
-import { AUTH_API } from "../api/apiConfig";
-
-// export default function ProtectedRoute({ children }) {
-//   const token = localStorage.getItem("token");
-
-//   // if don't have any token then redirect to login
-//   if (!token) {
-//     return <Navigate to="/login" replace />;
-//   }
-
-//   // if user have the valid token then redirect to children
-//   return children;
-// }
+import { authApi } from "../api/authApi";
 
 export default function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
@@ -27,10 +14,8 @@ export default function ProtectedRoute({ children }) {
       return;
     }
 
-    axiosClient
-      .get(`${AUTH_API}/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+    authApi
+      .getProfile()
       .then(() => {
         setValid(true);
       })

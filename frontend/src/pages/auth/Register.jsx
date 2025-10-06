@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { AUTH_API } from "../../api/apiConfig";
+// import { API_GATEWAY_URL } from "../../api/apiConfig";
+import { authApi } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
 
 export default function Register() {
@@ -15,11 +16,22 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    // try {
+    //   await axios.post(`${authApi}/register`, form);
+    //   navigate("/login");
+    // } catch (err) {
+    //   setError(err.response?.data?.message || "Registration failed");
+    // }
     try {
-      await axios.post(`${AUTH_API}/register`, form);
+      await authApi.register(form);
       navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err.message ||
+          "Registration failed"
+      );
     }
   };
 

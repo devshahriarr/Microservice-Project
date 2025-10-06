@@ -1,6 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
-import { AUTH_API } from "../../api/apiConfig";
+import { authApi } from "../../api/authApi";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -16,12 +15,30 @@ export default function Login() {
     e.preventDefault();
     setError(null);
     try {
-      const res = await axios.post(`${AUTH_API}/login`, form);
-      const token = res.data.token;
+
+      // use authApi helper
+      const res = await authApi.login(form);
+
+      // robust token extraction
+      const token =
+        res?.data?.token ||
+        res?.data?.authorisation?.token ||
+        res?.data?.access_token;
+
+      if (!token) {
+        throw new Error("Token not found in login response");
+      }
+
       localStorage.setItem("token", token);
       navigate("/dashboard");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      // setError(err.response?.data?.message || "Login failed");
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err.message ||
+          "Login failed"
+      );
     }
   };
 
