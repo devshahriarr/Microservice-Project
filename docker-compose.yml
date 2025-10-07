@@ -28,9 +28,9 @@ services:
       - APP_ENV=local
       - APP_KEY=base64:he87ErdEb7cN2MjBtt5xd3Sxb+5AbCSl2Jn/i9jUdYg=
       - DB_CONNECTION=mysql
-      - DB_HOST=db               # 👈 localhost না, বরং db
+      - DB_HOST=db               # use db as database host not localhost
       - DB_PORT=3306
-      - DB_DATABASE=auth_db      # 👈 তোমার আগে ছিল auth-db, mysql underscore পছন্দ করে
+      - DB_DATABASE=auth_db      
       - DB_USERNAME=root
       - DB_PASSWORD=root
     depends_on:
@@ -49,9 +49,9 @@ services:
       - APP_ENV=local
       - APP_KEY=base64:he87ErdEb7cN2MjBtt5xd3Sxb+5AbCSl2Jn/i9jUdYg=
       - DB_CONNECTION=mysql
-      - DB_HOST=db               # 👈 একইভাবে এখানে db
+      - DB_HOST=db               
       - DB_PORT=3306
-      - DB_DATABASE=crud_db      # 👈 তোমার আগে ছিল property, কিন্তু আলাদা নাম রাখাই ভালো
+      - DB_DATABASE=crud_db      
       - DB_USERNAME=root
       - DB_PASSWORD=root
     depends_on:
@@ -64,16 +64,36 @@ services:
   # ================================
   db:
     image: mysql:8.0
+
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: main_db     # 👈 এটা কেবল default তৈরি হবে, services আলাদা database তৈরি করতে পারবে
     ports:
       - "3307:3306"
+    # environment:
+    #   MYSQL_ROOT_PASSWORD: root
+    #   MYSQL_DATABASE: main_db     # It's just create a default database. service can create different database
+    # volumes:
+    #   - db_data:/var/lib/mysql
     volumes:
       - db_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d   # ✅ init script
     networks:
       - app-network
+
+  # ================================
+  #  MySQL Database
+  # ================================
+  frontend:
+    build:
+      context: ./frontend
+    container_name: microservice-frontend
+    ports:
+      - "3000:80"
+    networks:
+      - app-network
+    depends_on:
+      - gateway
 
 networks:
   app-network:

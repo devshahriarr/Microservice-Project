@@ -30,7 +30,7 @@ class ValidateAuthToken
         }
 
         // 2) Not cached → call auth-service /api/me
-        $authBase = rtrim(config('gateway.services.auth', env('AUTH_SERVICE_URL', 'http://localhost:8000')), '/');
+        $authBase = rtrim(config('gateway.services.auth', env('AUTH_SERVICE_URL', 'http://auth-service:8000')), '/');
         $authUrl = $authBase . '/api/me';
 
         try {
