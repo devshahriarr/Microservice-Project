@@ -12,8 +12,8 @@ services:
       - auth-service
       - crud-service
     environment:
-      - AUTH_SERVICE_URL=http://auth-service:8001
-      - CRUD_SERVICE_URL=http://crud-service:8002
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - CRUD_SERVICE_URL=http://crud-service:8001
     networks:
       - app-network
 
